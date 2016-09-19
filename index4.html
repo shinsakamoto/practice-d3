@@ -1,0 +1,68 @@
+<!DOCUTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+	<title>SP</title>
+	<style>
+	.axis path, .axis line{
+		 fill : none;
+		 stroke : black;
+	}
+	.axis text{
+		font-size : 10px;
+	}
+	</style>
+</head>
+<body>
+<script src="js/d3.min.js"></script>
+<script>
+
+var dataset = [12, 24, 36 , 48];
+var w = 500;
+var h = 200;
+var padding = 20;
+
+var xScale = d3.scaleLinear()
+.domain([0,d3.max(dataset)])
+.range([padding,w-padding])
+.nice();
+
+var svg = d3.select("body").append("svg")
+.attr("width",w)
+.attr("height",h);
+
+var xAxis = d3.axisBottom(xScale);
+
+svg.append("g")
+.attr("class", "axis")
+.attr("transform", "translate(0,180)")
+.call(xAxis);
+
+
+svg.selectAll("rect")
+.data(dataset)
+.enter().append("rect")
+.on("mouseover",function(d){
+	d3.select(this).attr("fill", "orange");
+})
+.on("mouseout",function(d){
+	d3.select(this).attr("fill", "red");
+})
+.on("click",function(d){
+	d3.select(this).attr("fill", "red");
+})
+.attr("x",padding)
+.attr("y",function(d,i){return (i * 25);})
+.attr("width", 0)
+.attr("height", 20)
+.attr("fill", "red")
+.transition()
+.delay(function(d,i){return i * 100;})
+.duration(500)
+// .ease(d3.easeBounceOut)
+.attr("width", function(d,i){return xScale(d) - padding;})
+
+
+</script>
+</body>
+</html>
