@@ -1,0 +1,52 @@
+<!DOCUTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+	<title>SP</title>
+	<style>
+	.axis path, .axis line{
+		 fill : none;
+		 stroke : gray;
+	}
+	.axis text{
+		font-size : 10px;
+	}
+	</style>
+</head>
+<body>
+<script src="js/d3.min.js"></script>
+<script>
+var xScale = d3.scaleLinear()
+.domain([0,380])
+.range([200,0])
+.nice();
+var yAxis = d3.axisLeft(xScale);
+
+var w = 800;
+var h = 500;
+var paddingx = 50;
+var paddingy = 30;
+
+var svg = d3.select("body").append("svg").attr("width",w).attr("height",h);
+
+var axisg = svg.append("g");
+axisg.attr("class", "axis").attr("transform", "translate(" + paddingx + "," + paddingy + ")").call(yAxis);
+
+
+var graphg = svg.append("g");
+graphg.attr("transform", "translate(" + paddingx + "," + paddingy + ")");
+
+dataset = [10,30,20];
+//
+var update1 = graphg.selectAll("g").data(dataset);
+var g = update1.enter().append("g");
+g.attr("transform", function(d,i) {return "translate(" + i*40 + "," + i*40 + ")";})
+g.append("rect")
+.attr("width", function(d,i){return 30})
+.attr("height", function(d,i){return 30})
+.attr("fill", "red");
+
+
+</script>
+</body>
+</html>

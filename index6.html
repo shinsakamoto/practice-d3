@@ -11,52 +11,22 @@
 	.axis text{
 		font-size : 10px;
 	}
-	.tick line{
-  opacity: 0.2;
-  }
 	</style>
 </head>
 <body>
 <script src="js/d3.min.js"></script>
 <script>
 
-var w = 800; //all size w
-var h = 300; //all size h
-var px = 50; //root parring x
-var py1 = 20;  //root parring y
-var py2 = 20;  //root parring y
-var gw = w - px; //graph w
-var gh = h - py1 - py2; //graph h
-
-
-
-var yScale = d3.scaleLinear()
-.domain([0,380])
-.range([gh,0])
-.nice();
-var yScale2 = d3.scaleLinear()
-.domain([0,380])
-.range([0,gh])
-.nice();
-
-var yAxis = d3.axisLeft(yScale);
-yAxis.tickSizeInner(-gw);
-
-
-var p_graph_x = 10; //graph start x
-
-
 var counter = 0;
 function newNode(){
 	var nw = 30;
-	var nvalue = Math.floor(Math.random() * 300 + 10);
-	var nh = yScale2(nvalue);
-	var nx = 40 * counter + p_graph_x;
-	var ny = gh - nh;
+	var nh = Math.floor(Math.random() * 300 + 10);
+	var nx = 40 * counter + 100;
+	var ny = 300 - nh;
 	var id = counter;
 	var nlabel = "label" + (counter + 1);
 	counter += 1;
-	return {x:nx , y:ny , w:nw , h:nh , c:"blue", id:id , lc:"white" , tc:"gray" , label:nlabel, value:nvalue}
+	return {x:nx , y:ny , w:nw , h:nh , c:"blue", id:id , tc:"gray" , label:nlabel}
 }
 
 //create node
@@ -71,15 +41,12 @@ var dataset = createNode(10);
 
 //alert(dataset.length);
 
+var w = 800;
+var h = 500;
 var svg = d3.select("body").append("svg").attr("width",w).attr("height",h);
-var axisg = svg.append("g");
-axisg.attr("class", "axis").attr("transform", "translate(" + px + "," + py1 + ")").call(yAxis);
-var graphg = svg.append("g");
-graphg.attr("transform", "translate(" + px + "," + py1 + ")");
-
 
 function draw(){
-	var selection = graphg.selectAll("g");
+	var selection = svg.selectAll("g");
 	var update = selection.data(dataset,function(d,i) {
 		// alert(d.id +  " - " + i);
 		return d ? d.id : i;
@@ -92,25 +59,15 @@ function draw(){
 	.attr("width", function(d,i){return d.w})
 	.attr("height", function(d,i){return d.h})
 	.attr("fill", function(d,i){console.log("enter=" + i);return d.c});
-	var labelt = g.append("text")
-	labelt.text( function (d) { return d.label; })
+	g.append("text")
+	.text( function (d) { return d.label; })
 	.attr("x", function(d,i){return d.w/2})
 	.attr("y", function(d,i){return d.h + 15})
   .attr("font-family", "sans-serif")
   .attr("font-size", "12px")
   .attr("fill", function(d,i){return d.tc})
 	.attr("alignment-baseline", "middle")
-	.attr("text-anchor", "middle");
-	var valuet = g.append("text")
-	valuet.text( function (d) { return d.value; })
-	.attr("x", function(d,i){return d.w/2})
-	.attr("y", function(d,i){return 15})
-	.attr("font-family", "sans-serif")
-	.attr("font-size", "12px")
-	.attr("fill", function(d,i){return d.lc})
-	.attr("alignment-baseline", "middle")
 	.attr("text-anchor", "middle")
-
 
   //exit
 	update.exit().remove();
@@ -119,22 +76,10 @@ function draw(){
   update.attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";})
   update.select("rect")
 	.attr("height", function(d,i){return d.h});
-	// update.select("text")
-	// .attr("y", function(d,i){return d.h + 15})
-	// .text( function (d) { return d.label; });
-	update.selectAll("text").each(function(p, j) {
-		//console.log( d3.select(this) );
-		console.log(j);
-		if(j==0){
-      d3.select(this).attr("y", function(d,i){return d.h + 15})
-			.text( function (d) { return d.label; });
-		}else if(j==1){
-			d3.select(this).text( function (d) { return d.value; });
-		}
-	  // d3.select(this)
-	  //   .selectAll(".child")
-	  //     .text(function(d, i) { return "child " + d.name + " of " + p.name; });
-	});
+	update.select("text")
+	.attr("y", function(d,i){return d.h + 15})
+	.text( function (d) { return d.label; });
+
 
 }
 
@@ -175,19 +120,19 @@ draw();
 
 setInterval(function(){
 	var i = Math.floor(Math.random() * dataset.length);
-  var dvalue = Math.floor(Math.random() * 20) - 10;
+  var dh = Math.floor(Math.random() * 10) - 5;
 	id = dataset[i].id;
-	dataset[i].value += dvalue;
-	dataset[i].h = yScale2(dataset[i].value);
-  dataset[i].y = gh - dataset[i].h;
+	dataset[i].h += dh;
+	dataset[i].y -= dh;
+	dataset[i].label = dataset[i].h;
 	draw();
 
-	var node = graphg.selectAll("g").filter(function(d, i) { return d.id == id; });
+	var node = d3.selectAll("g").filter(function(d, i) { return d.id == id; });
 	node.select("rect").transition()
 	.duration(100)
 	.attr("fill", "red")
 	.transition()
-	.duration(300)
+	.duration(500)
 	.attr("fill", function(d,i){console.log("enter=" + i);return d.c});
 },100);
 

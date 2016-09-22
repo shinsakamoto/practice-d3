@@ -28,12 +28,13 @@ var py2 = 20;  //root parring y
 var gw = w - px; //graph w
 var gh = h - py1 - py2; //graph h
 
-
+var p_graph_x = 10; //graph start x
 
 var yScale = d3.scaleLinear()
 .domain([0,380])
 .range([gh,0])
 .nice();
+
 var yScale2 = d3.scaleLinear()
 .domain([0,380])
 .range([0,gh])
@@ -42,14 +43,10 @@ var yScale2 = d3.scaleLinear()
 var yAxis = d3.axisLeft(yScale);
 yAxis.tickSizeInner(-gw);
 
-
-var p_graph_x = 10; //graph start x
-
-
 var counter = 0;
 function newNode(){
 	var nw = 30;
-	var nvalue = Math.floor(Math.random() * 300 + 10);
+	var nvalue = Math.floor(Math.random() * 350 + 50);
 	var nh = yScale2(nvalue);
 	var nx = 40 * counter + p_graph_x;
 	var ny = gh - nh;
@@ -59,17 +56,11 @@ function newNode(){
 	return {x:nx , y:ny , w:nw , h:nh , c:"blue", id:id , lc:"white" , tc:"gray" , label:nlabel, value:nvalue}
 }
 
-//create node
-//function createNode2(size, array){if(size<=0){return array;}else{size -= 1;array.push(newNode());return createNode(size, array)}};
-//var dataset = createNode2(12,[]);
-
 /*
  * create node
  */
 function createNode(size){var array=[]; for(var i = 0; i < size; i++) { array.push(newNode());}return array};
-var dataset = createNode(10);
-
-//alert(dataset.length);
+var dataset = createNode(18);
 
 var svg = d3.select("body").append("svg").attr("width",w).attr("height",h);
 var axisg = svg.append("g");
@@ -97,7 +88,7 @@ function draw(){
 	.attr("x", function(d,i){return d.w/2})
 	.attr("y", function(d,i){return d.h + 15})
   .attr("font-family", "sans-serif")
-  .attr("font-size", "12px")
+  .attr("font-size", "9px")
   .attr("fill", function(d,i){return d.tc})
 	.attr("alignment-baseline", "middle")
 	.attr("text-anchor", "middle");
@@ -111,7 +102,6 @@ function draw(){
 	.attr("alignment-baseline", "middle")
 	.attr("text-anchor", "middle")
 
-
   //exit
 	update.exit().remove();
 
@@ -119,59 +109,17 @@ function draw(){
   update.attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";})
   update.select("rect")
 	.attr("height", function(d,i){return d.h});
-	// update.select("text")
-	// .attr("y", function(d,i){return d.h + 15})
-	// .text( function (d) { return d.label; });
 	update.selectAll("text").each(function(p, j) {
-		//console.log( d3.select(this) );
-		console.log(j);
 		if(j==0){
       d3.select(this).attr("y", function(d,i){return d.h + 15})
 			.text( function (d) { return d.label; });
 		}else if(j==1){
 			d3.select(this).text( function (d) { return d.value; });
 		}
-	  // d3.select(this)
-	  //   .selectAll(".child")
-	  //     .text(function(d, i) { return "child " + d.name + " of " + p.name; });
 	});
 
 }
-
 draw();
-//
-// setTimeout(function(){
-// 	dataset.splice(1, 1);
-// 	dataset.push(newNode());
-// 	dataset[0].h += 30;
-// 	dataset[0].y -= 30;
-// 	console.log("---------------------------")
-// 	draw();
-// },1000);
-//
-// setTimeout(function(){
-// 	var n = newNode();
-// 	n.id = 1;
-// 	dataset.push(n);
-// 	console.log("---------------------------")
-// 	draw();
-// },2000);
-
-// setInterval(function(){
-// 	for (var i = 0, len = dataset.length; i < len; i++) {
-// 		var dh = Math.floor(Math.random() * 10) - 5;
-// 		dataset[i].h += dh;
-// 		dataset[i].y -= dh;
-// 		dataset[i].label = dataset[i].h;
-// 		var h = dataset[i].h;
-// 		if(h <= 0){
-// 			dataset[i].h = 0;
-// 			dataset[i].y = 300;
-// 			dataset[i].label = "0";
-// 		}
-// 	}
-// 	draw();
-// },100);
 
 setInterval(function(){
 	var i = Math.floor(Math.random() * dataset.length);
