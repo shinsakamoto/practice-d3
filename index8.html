@@ -78,15 +78,16 @@ function draw(){
 
   //enter
 	var g = update.enter().append("g");
-	g.attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";})
+	g.attr("transform", function(d) {return "translate(" + d.x + ",0)";})
 	g.append("rect")
+	.attr("y", function(d,i){return d.y})
 	.attr("width", function(d,i){return d.w})
 	.attr("height", function(d,i){return d.h})
 	.attr("fill", function(d,i){console.log("enter=" + i);return d.c});
 	var labelt = g.append("text")
 	labelt.text( function (d) { return d.label; })
 	.attr("x", function(d,i){return d.w/2})
-	.attr("y", function(d,i){return d.h + 15})
+	.attr("y", function(d,i){return d.y + d.h + 15})
   .attr("font-family", "sans-serif")
   .attr("font-size", "9px")
   .attr("fill", function(d,i){return d.tc})
@@ -95,7 +96,7 @@ function draw(){
 	var valuet = g.append("text")
 	valuet.text( function (d) { return d.value; })
 	.attr("x", function(d,i){return d.w/2})
-	.attr("y", function(d,i){return 15})
+	.attr("y", function(d,i){return d.y + 15})
 	.attr("font-family", "sans-serif")
 	.attr("font-size", "12px")
 	.attr("fill", function(d,i){return d.lc})
@@ -106,37 +107,46 @@ function draw(){
 	update.exit().remove();
 
   //update
-  update.attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";})
-  update.select("rect")
-	.attr("height", function(d,i){return d.h});
-	update.selectAll("text").each(function(p, j) {
-		if(j==0){
-      d3.select(this).attr("y", function(d,i){return d.h + 15})
-			.text( function (d) { return d.label; });
-		}else if(j==1){
-			d3.select(this).text( function (d) { return d.value; });
-		}
-	});
+  //update.attr("transform", function(d) {return "translate(" + d.x + ",0)";})
 
 }
 draw();
 
 setInterval(function(){
 	var i = Math.floor(Math.random() * dataset.length);
-  var dvalue = Math.floor(Math.random() * 20) - 10;
+  var dvalue = Math.floor(Math.random() * 100) - 50;
 	id = dataset[i].id;
 	dataset[i].value += dvalue;
 	dataset[i].h = yScale2(dataset[i].value);
   dataset[i].y = gh - dataset[i].h;
-	draw();
 
 	var node = graphg.selectAll("g").filter(function(d, i) { return d.id == id; });
-	node.select("rect").transition()
-	.duration(100)
-	.attr("fill", "red")
+	node.select("rect")
+	.attr("fill", function(d,i){return "red"})
 	.transition()
 	.duration(300)
+	.attr("y", function(d,i){return d.y})
+	.attr("height", function(d,i){return d.h})
+	.transition()
+	.delay(500)
 	.attr("fill", function(d,i){console.log("enter=" + i);return d.c});
+
+	node.selectAll("text").each(function(p, j) {
+		if(j==0){
+			d3.select(this)
+			.attr("y", function(d,i){return d.y + d.h + 15})
+			.text( function (d) { return d.label; })
+		}else if(j==1){
+			d3.select(this).text( function (d) { return d.value; })
+			.transition()
+			.duration(300)
+			.attr("y", function(d,i){return d.y + 15});
+		}
+	});
+
+
+	draw();
+
 },100);
 
 </script>
